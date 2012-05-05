@@ -10,8 +10,11 @@
 	Domain Path: /lang
  */
 
+//define global (mainly for use in options
+define('WPRABT_UNIQUE', 'wp_rabt');
 
-include('lib/functions.php');
+
+require_once('lib/functions.php');
 
 
 // Example shortcode: [wp-rabt cat="3" type="post" show="3" order="ASC" mode="attachments" textlength="200"]
