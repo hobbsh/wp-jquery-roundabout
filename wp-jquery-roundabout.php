@@ -10,35 +10,12 @@
 	Domain Path: /lang
  */
 
-//get user options
 
-function get_options($options_array){
+include('lib/functions.php');
 
-}
-
-function custom_text_length($charlength, $more_link, $c_type){
-	global $post;
-	$text = '';
-	if($c_type == 'content'){
-		$raw_text = $post->post_content;
-	}
-	else{
-		$raw_text = $post->post_content;
-	}
-	$link = '<a href="'.get_permalink().'">'.$more_link.'</a>';
-	if ( mb_strlen( $raw_text ) > $charlength ) {
-		$subex = mb_substr( $raw_text, 0, $charlength - 5 );
-		$subex = '<p>'.$subex.'…'.$link.'</p>';
-		return $subex;
-	}
-	else{
-		$raw_text = '<p>'.$raw_text.'…'.$link.'<p>';
-		return $raw_text;
-	}
-}
 
 // Example shortcode: [wp-rabt cat="3" type="post" show="3" order="ASC" mode="attachments" textlength="200"]
-function wprabt_shortcode_handler($atts, $content = null){
+function display_carousel(){
 	extract( shortcode_atts( array(
       'cat' => '',
       'type' => 'post',
@@ -47,15 +24,10 @@ function wprabt_shortcode_handler($atts, $content = null){
       'mode' => 'post',
       'textlength' => 200
      ), $atts ) );
-
-}
-
-add_shortcode('wp-rabt', 'wprabt_shortcode_handler');
-
-function display_carousel(){
+     
 	$class = '';
 	
-	if($atts['mode'] == 'attachments'){
+	if($mode == 'attachments'){
 		$class='attachment-mode';
 	}
 	else{
@@ -67,8 +39,8 @@ function display_carousel(){
 	global $post;
 		
 		$args = array(
-			'post_type' => $atts['type'],
-			'numberposts' => $atts['show']
+			'post_type' => $type,
+			'numberposts' => $show
 		);
 
 	
@@ -76,7 +48,7 @@ function display_carousel(){
 		
 		foreach($posts as $post){
 		
-			if($atts['mode'] == 'attachments'){
+			if($mode == 'attachments'){
 				
 				$att_args = array(
 				 	'post_type' => 'attachment',
@@ -117,7 +89,7 @@ function display_carousel(){
 				echo '<div class="wp-rabt-image">' . get_the_post_thumbnail($post->ID) . '</div>';
 				echo '<div class="wp-rabt-content">';
 				echo '<h5>' . $post->post_title . '</h5>';
-				echo custom_text_length($atts['textlength'], 'read more', 'content');
+				echo custom_text_length($textlength, 'read more', 'content');
 				echo '</div>';
 				echo '</a></li>';
 			}
@@ -130,6 +102,7 @@ function display_carousel(){
 	
 }
 
+add_shortcode('wp-rabt', 'display_carousel');
 add_theme_support('post-thumbnails');
 add_filter('get_the_content', 'do_shortcode');
 add_filter('get_the_excerpt', 'do_shortcode');
