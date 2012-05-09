@@ -11,26 +11,32 @@
  */
 
 //define global (mainly for use in options
-define('WPRABT_UNIQUE', 'wp_rabt');
+define('WPRABT_UNIQUE', 'wprabt');
 
 
 require_once('lib/functions.php');
 
-
-// Example shortcode: [wp-rabt cat="3" type="post" show="3" order="ASC" mode="attachments" textlength="200"]
-function display_carousel(){
-	extract( shortcode_atts( array(
+function wprabt_shortcode($atts){
+	$args = shortcode_atts( array(
       'cat' => '',
       'type' => 'post',
       'show' => 3,
       'order' => 'DESC',
       'mode' => 'post',
       'textlength' => 200
-     ), $atts ) );
-     
+     	), $atts	
+     );
+
+	return display_carousel($args);
+}
+add_shortcode('wprabt', 'wprabt_shortcode');
+
+// Example shortcode: [wprabt cat="3" type="post" show="3" order="ASC" mode="attachments" textlength="200"]
+function display_carousel($args){
+
 	$class = '';
 	
-	if($mode == 'attachments'){
+	if($args['mode'] == 'attachments'){
 		$class='attachment-mode';
 	}
 	else{
@@ -41,18 +47,20 @@ function display_carousel(){
 		
 	global $post;
 		
-		$args = array(
-			'post_type' => $type,
-			'numberposts' => $show
+		//arguments for get_posts query
+		$post_args = array(
+			'post_type' => $args['type'],
+			'numberposts' => $args['show']
 		);
 
 	
-		$posts = get_posts( $args );
+		$posts = get_posts( $post_args );
 		
 		foreach($posts as $post){
 		
 			if($mode == 'attachments'){
-				
+			
+				//arguments for attachments query
 				$att_args = array(
 				 	'post_type' => 'attachment',
 				 	'numberposts' => 2,
@@ -92,7 +100,7 @@ function display_carousel(){
 				echo '<div class="wp-rabt-image">' . get_the_post_thumbnail($post->ID) . '</div>';
 				echo '<div class="wp-rabt-content">';
 				echo '<h5>' . $post->post_title . '</h5>';
-				echo custom_text_length($textlength, 'read more', 'content');
+				echo custom_text_length($args['textlength'], 'read more', 'content');
 				echo '</div>';
 				echo '</a></li>';
 			}
@@ -105,7 +113,6 @@ function display_carousel(){
 	
 }
 
-add_shortcode('wp-rabt', 'display_carousel');
 add_theme_support('post-thumbnails');
 add_filter('get_the_content', 'do_shortcode');
 add_filter('get_the_excerpt', 'do_shortcode');
